@@ -1,12 +1,14 @@
+# Building Lokkna: A Barter Trading Platform Case Study
+
 import { ArticleLayout } from '@/components/ArticleLayout'
-import designSystem from './planetaria-design-system.png'
+import lokknaArchitecture from './Lokkna-Arch.webp'
 
 export const article = {
-  author: 'Adam Wathan',
-  date: '2022-09-05',
-  title: 'Crafting a design system for a multiplanetary future',
+  author: 'Nasir Iqbal',
+  date: '2024-07-15',
+  title: 'Building Lokkna: A Modern Barter Trading Platform',
   description:
-    'Most companies try to stay ahead of the curve when it comes to visual design, but for Planetaria we needed to create a brand that would still inspire us 100 years from now when humanity has spread across our entire solar system.',
+    'A technical deep dive into the architecture and implementation of Lokkna, a full-stack barter trading platform built with NextJS and Django that enables users to trade goods and services without currency.',
 }
 
 export const metadata = {
@@ -16,75 +18,400 @@ export const metadata = {
 
 export default (props) => <ArticleLayout article={article} {...props} />
 
-Most companies try to stay ahead of the curve when it comes to visual design, but for Planetaria we needed to create a brand that would still inspire us 100 years from now when humanity has spread across our entire solar system.
+In today's digital economy, most transactions revolve around currency. However, the ancient practice of bartering—trading goods and services directly—still holds tremendous value. [Lokkna](https://lokkna.com) was conceived as a modern platform to revitalize this age-old concept, allowing users to exchange items and services without money changing hands.
 
-<Image src={designSystem} alt="" />
+<Image src={lokknaArchitecture} alt="Lokkna Architecture Diagram" />
 
-I knew that to get it right I was going to have to replicate the viewing conditions of someone from the future, so I grabbed my space helmet from the closet, created a new Figma document, and got to work.
+This case study explores the technical journey of building Lokkna from April 2020 to June 2022, highlighting key architectural decisions, implementation challenges, and solutions that made this platform successful.
 
-## Sermone fata
+## Architecture Overview
 
-Lorem markdownum, bracchia in redibam! Terque unda puppi nec, linguae posterior
-in utraque respicere candidus Mimasque formae; quae conantem cervice. Parcite
-variatus, redolentia adeunt. Tyrioque dies, naufraga sua adit partibus celanda
-torquere temptata, erit maneat et ramos, [iam](#) ait dominari
-potitus! Tibi litora matremque fumantia condi radicibus opusque.
+Lokkna was built as a full-stack application with a clear separation between frontend and backend:
 
-Deus feram verumque, fecit, ira tamen, terras per alienae victum. Mutantur
-levitate quas ubi arcum ripas oculos abest. Adest [commissaque
-victae](#) in gemitus nectareis ire diva
-dotibus ora, et findi huic invenit; fatis? Fractaque dare superinposita
-nimiumque simulatoremque sanguine, at voce aestibus diu! Quid veterum hausit tu
-nil utinam paternos ima, commentaque.
+- **Frontend**: NextJS with TypeScript, TailwindCSS, and Redux/RTK Query
+- **Backend**: Django with Django REST Framework and Django Channels
+- **Authentication**: JWT with OAuth support
+- **Real-time Communication**: WebSockets via Django Channels
 
-```c
-exbibyte_wins = gigahertz(3);
-grayscaleUtilityClient = control_uat;
-pcmciaHibernate = oop_virus_console(text_mountain);
-if (stateWaisFirewire >= -2) {
-    jfs = 647065 / ldapVrml(tutorialRestore, 85);
-    metal_runtime_parse = roomComputingResolution - toolbarUpload +
-            ipx_nvram_open;
-} else {
-    maximizeSidebar *= suffix_url(flatbed + 2, requirements_encoding_node +
-            only_qbe_media, minicomputer);
+This architecture allowed us to leverage the strengths of both ecosystems: React's component-based UI development and Django's robust ORM and authentication systems.
+
+## Building the Backend API with Django REST Framework
+
+The backend served as the foundation of Lokkna, handling data persistence, business logic, and API endpoints. Django REST Framework (DRF) provided a powerful toolkit for building RESTful APIs.
+
+#### Below code is just for reference not real code used in the project
+
+### Data Modeling
+
+The core models of Lokkna included:
+
+```python
+class User(AbstractUser):
+    bio = models.TextField(blank=True)
+    location = models.CharField(max_length=100, blank=True)
+    profile_image = models.ImageField(upload_to='profile_images/', blank=True)
+
+class Item(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='items')
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    condition = models.CharField(max_length=50, choices=CONDITION_CHOICES)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
+    images = models.ManyToManyField(ItemImage)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class Trade(models.Model):
+    initiator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='initiated_trades')
+    responder = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_trades')
+    initiator_items = models.ManyToManyField(Item, related_name='initiator_trade_items')
+    responder_items = models.ManyToManyField(Item, related_name='responder_trade_items')
+    status = models.CharField(max_length=20, choices=TRADE_STATUS_CHOICES)
+    created_at = models.DateTimeField(auto_now_add=True)
+```
+
+### API Endpoints
+
+We designed a comprehensive set of RESTful endpoints:
+
+```python
+# urls.py
+router = DefaultRouter()
+router.register(r'users', UserViewSet)
+router.register(r'items', ItemViewSet)
+router.register(r'trades', TradeViewSet)
+router.register(r'categories', CategoryViewSet)
+
+urlpatterns = [
+    path('api/', include(router.urls)),
+    path('api/auth/', include('authentication.urls')),
+    path('api/chat/', include('chat.urls')),
+]
+```
+
+### Custom Django Admin Panel
+
+One of the key requirements was a powerful admin interface for content moderation. We extended Django's built-in admin panel with custom views and actions:
+
+```python
+@admin.register(Item)
+class ItemAdmin(admin.ModelAdmin):
+    list_display = ('title', 'owner', 'category', 'condition', 'created_at', 'is_active')
+    list_filter = ('category', 'condition', 'is_active')
+    search_fields = ('title', 'description', 'owner__username')
+    actions = ['approve_items', 'reject_items']
+
+    def approve_items(self, request, queryset):
+        queryset.update(is_active=True)
+    approve_items.short_description = "Approve selected items"
+
+    def reject_items(self, request, queryset):
+        queryset.update(is_active=False)
+    reject_items.short_description = "Reject selected items"
+```
+
+This customization allowed administrators to efficiently manage user-generated content, ensuring platform quality and safety.
+
+## Implementing Real-time Chat with Django Channels
+
+One of the most challenging and rewarding aspects of building Lokkna was implementing the real-time private chat system. Django Channels provided the WebSocket capabilities needed for this feature.
+
+### Channel Layer Configuration
+
+We configured Redis as the channel layer backend:
+
+```python
+# settings.py
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('redis', 6379)],
+        },
+    },
 }
 ```
 
-Aere repetiti cognataque natus. Habebat vela solutis saepe munus nondum adhuc
-oscula nomina pignora corpus deserat.
+### WebSocket Consumer
 
-## Lethaei Pindumve me quae dinumerat Pavor
+The core of the chat functionality was the WebSocket consumer:
 
-Idem se saxa fata pollentibus geminos; quos pedibus. Est urnis Herses omnes nec
-divite: et ille illa furit sim verbis Cyllenius.
+```python
+class ChatConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.user = self.scope['user']
+        self.chat_id = self.scope['url_route']['kwargs']['chat_id']
+        self.room_group_name = f'chat_{self.chat_id}'
 
-1. Captus inpleverunt collo
-2. Nec nam placebant
-3. Siquos vulgus
-4. Dictis carissime fugae
-5. A tacitos nulla viginti
+        # Verify user has access to this chat
+        chat = await self.get_chat()
+        if not chat or (self.user != chat.user1 and self.user != chat.user2):
+            await self.close()
+            return
 
-Ungues fistula annoso, ille addit linoque motatque uberior verso
-[rubuerunt](#) confine desuetaque. _Sanguine_ anteit
-emerguntque expugnacior est pennas iniqui ecce **haeret** genus: peiora imagine
-fossas Cephisos formosa! Refugitque amata [refelli](#)
-supplex. Summa brevis vetuere tenebas, hostes vetantis, suppressit, arreptum
-regna. Postquam conpescit iuvenis habet corpus, et erratica, perdere, tot mota
-ars talis.
+        # Join room group
+        await self.channel_layer.group_add(
+            self.room_group_name,
+            self.channel_name
+        )
+        await self.accept()
 
-```c
-digital.webcam_dual_frequency = webmasterMms;
-if (5 + language_standalone_google) {
-    cc_inbox_layout *= file_character;
-    task += p;
-    lockUnicode += enterprise_monochrome(tokenFunctionPersonal, keyVirtual,
-            adf);
-}
-windows_binary_esports(87734, array(restoreRomTopology, adRaw(407314),
-        dongleBashThumbnail), interpreter);
+    async def disconnect(self, close_code):
+        # Leave room group
+        await self.channel_layer.group_discard(
+            self.room_group_name,
+            self.channel_name
+        )
+
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+        message = data['message']
+
+        # Save message to database
+        await self.save_message(message)
+
+        # Send message to room group
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'chat_message',
+                'message': message,
+                'user_id': self.user.id,
+                'username': self.user.username,
+                'timestamp': datetime.now().isoformat(),
+            }
+        )
+
+    async def chat_message(self, event):
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps(event))
+
+    @database_sync_to_async
+    def get_chat(self):
+        try:
+            return Chat.objects.get(id=self.chat_id)
+        except Chat.DoesNotExist:
+            return None
+
+    @database_sync_to_async
+    def save_message(self, message):
+        chat = Chat.objects.get(id=self.chat_id)
+        Message.objects.create(
+            chat=chat,
+            sender=self.user,
+            content=message
+        )
 ```
 
-Sit volat naturam; motu Cancri. Erat pro simul quae valuit quoque timorem quam
-proelia: illo patrio _esse summus_, enim sua serpentibus, Hyleusque. Est coniuge
-recuso; refert Coroniden ignotos manat, adfectu.
+### Routing Configuration
+
+We set up the WebSocket routing:
+
+```python
+# routing.py
+websocket_urlpatterns = [
+    re_path(r'ws/chat/(?P<chat_id>\w+)/$', ChatConsumer.as_asgi()),
+]
+```
+
+This implementation enabled users to communicate in real-time, enhancing the trading experience by allowing immediate negotiation and discussion about items.
+
+## Secure Authentication with JWT
+
+For Lokkna, we implemented a secure authentication system using JWT (JSON Web Tokens) with OAuth support:
+
+```python
+# authentication/views.py
+class TokenObtainPairView(APIView):
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        user = authenticate(username=username, password=password)
+
+        if user:
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'user': UserSerializer(user).data
+            })
+
+        return Response({'error': 'Invalid credentials'}, status=401)
+
+class OAuthCallbackView(APIView):
+    def get(self, request, provider):
+        # Handle OAuth callback from providers (Google, Facebook, etc.)
+        code = request.GET.get('code')
+
+        # Exchange code for token with provider
+        user_data = exchange_code_for_user_data(provider, code)
+
+        # Find or create user
+        user, created = User.objects.get_or_create(
+            email=user_data['email'],
+            defaults={
+                'username': generate_username_from_email(user_data['email']),
+                'first_name': user_data.get('first_name', ''),
+                'last_name': user_data.get('last_name', '')
+            }
+        )
+
+        # Generate JWT tokens
+        refresh = RefreshToken.for_user(user)
+
+        # Redirect to frontend with tokens
+        redirect_url = f"{settings.FRONTEND_URL}/auth/callback?token={str(refresh.access_token)}"
+        return redirect(redirect_url)
+```
+
+This approach provided a seamless authentication experience while maintaining high security standards.
+
+## Frontend Implementation with NextJS
+
+The frontend of Lokkna was built with NextJS, providing a fast, SEO-friendly user experience with server-side rendering capabilities.
+
+### State Management with Redux and RTK Query
+
+We used Redux for global state management and RTK Query for data fetching:
+
+```typescript
+// api/apiSlice.ts
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+
+export const apiSlice = createApi({
+  reducerPath: 'api',
+  baseQuery: fetchBaseQuery({
+    baseUrl: process.env.NEXT_PUBLIC_API_URL,
+    prepareHeaders: (headers, { getState }) => {
+      const token = (getState() as RootState).auth.token
+      if (token) {
+        headers.set('authorization', `Bearer ${token}`)
+      }
+      return headers
+    },
+  }),
+  tagTypes: ['Items', 'Trades', 'User', 'Messages'],
+  endpoints: (builder) => ({
+    getItems: builder.query({
+      query: (params) => ({
+        url: '/items/',
+        params,
+      }),
+      providesTags: ['Items'],
+    }),
+    // Other endpoints...
+  }),
+})
+
+export const {
+  useGetItemsQuery,
+  useGetItemByIdQuery,
+  useCreateItemMutation,
+  // Other hooks...
+} = apiSlice
+```
+
+### Chat Interface Implementation
+
+The frontend chat interface connected to our WebSocket backend:
+
+```typescript
+// components/Chat/ChatWindow.tsx
+import { useEffect, useState, useRef } from 'react';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '@/features/auth/authSlice';
+
+const ChatWindow = ({ chatId, recipientId }) => {
+  const [socket, setSocket] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [inputValue, setInputValue] = useState('');
+  const messagesEndRef = useRef(null);
+  const currentUser = useSelector(selectCurrentUser);
+
+  useEffect(() => {
+    // Connect to WebSocket
+    const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WS_URL}/ws/chat/${chatId}/`);
+
+    ws.onopen = () => {
+      console.log('Connected to chat socket');
+    };
+
+    ws.onmessage = (e) => {
+      const data = JSON.parse(e.data);
+      setMessages(prev => [...prev, data]);
+    };
+
+    ws.onclose = () => {
+      console.log('Disconnected from chat socket');
+    };
+
+    setSocket(ws);
+
+    // Cleanup on unmount
+    return () => {
+      ws.close();
+    };
+  }, [chatId]);
+
+  useEffect(() => {
+    // Scroll to bottom when messages change
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const sendMessage = (e) => {
+    e.preventDefault();
+    if (!inputValue.trim() || !socket) return;
+
+    socket.send(JSON.stringify({
+      message: inputValue
+    }));
+
+    setInputValue('');
+  };
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.map((msg, index) => (
+          <div
+            key={index}
+            className={`flex ${msg.user_id === currentUser.id ? 'justify-end' : 'justify-start'}`}
+          >
+            <div className={`max-w-xs px-4 py-2 rounded-lg ${
+              msg.user_id === currentUser.id
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200 text-gray-800'
+            }`}>
+              <p>{msg.message}</p>
+              <span className="text-xs opacity-75">
+                {new Date(msg.timestamp).toLocaleTimeString()}
+              </span>
+            </div>
+          </div>
+        ))}
+        <div ref={messagesEndRef} />
+      </div>
+
+      <form onSubmit={sendMessage} className="border-t p-4">
+        <div className="flex">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className="flex-1 border rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Type a message..."
+          />
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 transition"
+          >
+            Send
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default ChatWindow;
+```

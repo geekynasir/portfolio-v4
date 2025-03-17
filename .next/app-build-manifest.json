@@ -16,10 +16,10 @@
       "static/chunks/main-app.js",
       "static/chunks/app/not-found.js"
     ],
-    "/about/page": [
+    "/articles/crafting-a-design-system-for-a-multiplanetary-future/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/about/page.js"
+      "static/chunks/app/articles/crafting-a-design-system-for-a-multiplanetary-future/page.js"
     ],
     "/articles/page": [
       "static/chunks/webpack.js",

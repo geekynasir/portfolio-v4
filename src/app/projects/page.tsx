@@ -8,41 +8,39 @@ import logoCosmos from '@/images/logos/cosmos.svg'
 import logoHelioStream from '@/images/logos/helio-stream.svg'
 import logoOpenShuttle from '@/images/logos/open-shuttle.svg'
 import PoppyAiLogo from '@/images/logos/poppyai.jpeg'
-
+import LokknaLogo from '@/images/logos/lokknaLogo.png'
+import dtrustLogo from '@/images/logos/dtrustLogo.png'
+import surertLogo from '@/images/logos/surertLogo.png'
 const projects = [
   {
     name: 'Poppy Ai ',
     description: 'Digital Whiteboard with AI Superpowers 💪',
-    link: { href: 'http://planetaria.tech', label: 'Poppy AI ' },
+    link: { href: 'http://getpoppy.ai', label: 'Poppy AI ' },
     logo: PoppyAiLogo,
   },
   {
-    name: 'Animaginary',
+    name: 'Lokkna',
     description:
-      'High performance web animation library, hand-written in optimized WASM.',
-    link: { href: '#', label: 'github.com' },
-    logo: logoAnimaginary,
+      'BarterTrading Platform form the future, where you can trade anything for anything.',
+    link: { href: 'https://www.lokkna.com', label: 'Lokkna' },
+    logo: LokknaLogo,
   },
   {
-    name: 'HelioStream',
+    name: 'Dtrust',
     description:
-      'Real-time video streaming library, optimized for interstellar transmission.',
-    link: { href: '#', label: 'github.com' },
-    logo: logoHelioStream,
+      'A decentralized trust platform that allows you to create and manage trusts on the blockchain.',
+    link: {
+      href: 'https://x.com/i/status/1722408304239100178',
+      label: 'Dtrust Demo',
+    },
+    logo: dtrustLogo,
   },
   {
-    name: 'cosmOS',
+    name: 'Surert',
     description:
-      'The operating system that powers our Planetaria space shuttles.',
-    link: { href: '#', label: 'github.com' },
-    logo: logoCosmos,
-  },
-  {
-    name: 'OpenShuttle',
-    description:
-      'The schematics for the first rocket I designed that successfully made it to orbit.',
-    link: { href: '#', label: 'github.com' },
-    logo: logoOpenShuttle,
+      'SureRT is a Sports Betting Platform that allows you to bet on your favorite sports and earn rewards through NFTs.',
+    link: { href: 'https://surert.nazaweb.com/', label: 'SureRT Demo' },
+    logo: surertLogo,
   },
 ]
 

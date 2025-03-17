@@ -11,6 +11,7 @@ import {
   BlogIcon,
   YouTubeIcon,
   FiverrIcon,
+  InstagramIcon,
 } from '@/components/SocialIcons'
 import logoGitHub from '@/images/logos/github.svg'
 import logoVSCode from '@/images/logos/vscode.svg'
@@ -295,17 +296,23 @@ export default async function Home() {
       <Container className="mt-9">
         <div className="max-w-2xl">
           <h1 className="text-4xl font-bold tracking-tight text-neutral-800 sm:text-5xl dark:text-neutral-100">
-            Full-Stack Developer & Tech Mentor
+            Full-Stack Developer BlockChain & AI Enthusiast
           </h1>
           <p className="mt-6 text-base text-neutral-600 dark:text-neutral-400">
-            I'm Nasir Iqbal, a full-stack web developer, tech mentor, and the
-            founder of Devthinks LLC. With expertise in Python, Django, Node.js,
-            React, and Next.js, I specialize in building scalable web
-            applications and mentoring aspiring developers. Based in Islamabad,
-            I've helped 100+ students master JavaScript and React through
-            one-on-one coaching.
+            I'm Nasir Iqbal, a full-stack web developer, tech mentor. With
+            expertise in Python, Django, Node.js, React, and Next.js, I
+            specialize in building scalable web applications and mentoring
+            aspiring developers. Based in Islamabad, I've helped 100+ students
+            master JavaScript and React through one-on-one coaching.
           </p>
           <div className="mt-6 flex gap-6">
+            <SocialLink
+              href="https://instagram.com/geekynasir"
+              aria-label="Follow on Instagram"
+              icon={InstagramIcon}
+              target="_blank"
+              className="hover:text-primary-500 dark:hover:text-primary-400 text-neutral-500 dark:text-neutral-400"
+            />
             <SocialLink
               href="https://github.com/geekynasir"
               aria-label="Follow on GitHub"

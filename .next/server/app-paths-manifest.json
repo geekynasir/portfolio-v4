@@ -1,5 +1,5 @@
 {
   "/page": "app/page.js",
-  "/projects/page": "app/projects/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js"
+  "/articles/crafting-a-design-system-for-a-multiplanetary-future/page": "app/articles/crafting-a-design-system-for-a-multiplanetary-future/page.js",
+  "/projects/page": "app/projects/page.js"
 }
