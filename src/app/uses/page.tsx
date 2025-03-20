@@ -35,86 +35,92 @@ function Tool({
 }
 
 export const metadata = {
-  title: 'Uses',
-  description: 'Software I use, gadgets I love, and other things I recommend.',
+  title: 'My Setup & Tools',
+  description:
+    'A curated collection of hardware, software, and tools I use for full-stack development, AI/ML work, and content creation.',
 }
 
 export default function Uses() {
   return (
     <SimpleLayout
-      title="Software I use, gadgets I love, and other things I recommend."
-      intro="I get asked a lot about the things I use to build software, stay productive, or buy to fool myself into thinking I’m being productive when I’m really just procrastinating. Here’s a big list of all of my favorite stuff."
+      title="My Development Setup & Creative Workspace"
+      intro="As a full-stack developer who works with both Mac and Windows, here's my dual-platform setup that helps me stay productive. From AI-powered development tools to cross-platform testing devices, these are the tools that power my daily workflow."
     >
       <div className="space-y-20">
         <ToolsSection title="Workstation">
-          <Tool title="16” MacBook Pro, M1 Max, 64GB RAM (2021)">
-            I was using an Intel-based 16” MacBook Pro prior to this and the
-            difference is night and day. I’ve never heard the fans turn on a
-            single time, even under the incredibly heavy loads I put it through
-            with our various launch simulations.
+          <Tool title="MacBook Pro M1 (2020) 16GB RAM">
+            My primary development machine for on-the-go work. The M1 chip
+            provides excellent performance while maintaining incredible battery
+            life.
           </Tool>
-          <Tool title="Apple Pro Display XDR (Standard Glass)">
-            The only display on the market if you want something HiDPI and
-            bigger than 27”. When you’re working at planetary scale, every pixel
-            you can get counts.
+          <Tool title="Custom Gaming PC (RTX 3060Ti, AMD Ryzen 5700X3D)">
+            My powerhouse desktop for gaming and resource-intensive development
+            tasks. Perfect for running multiple environments and handling heavy
+            workloads.
           </Tool>
-          <Tool title="IBM Model M SSK Industrial Keyboard">
-            They don’t make keyboards the way they used to. I buy these any time
-            I see them go up for sale and keep them in storage in case I need
-            parts or need to retire my main.
+          <Tool title="ASUS PG329Q 32-inch 2K IPS 175Hz Monitor">
+            My main display - a perfect balance of size, resolution, and refresh
+            rate. The IPS panel provides excellent color accuracy for both
+            development and content creation.
           </Tool>
-          <Tool title="Apple Magic Trackpad">
-            Something about all the gestures makes me feel like a wizard with
-            special powers. I really like feeling like a wizard with special
-            powers.
+          <Tool title="Dual 24-inch HP Bezel-less Monitors">
+            Secondary displays for enhanced productivity. The bezel-less design
+            creates a seamless multi-monitor experience.
           </Tool>
-          <Tool title="Herman Miller Aeron Chair">
-            If I’m going to slouch in the worst ergonomic position imaginable
-            all day, I might as well do it in an expensive chair.
+          <Tool title="ASUS Gaming Chair">
+            Comfortable gaming chair that provides good support during long
+            coding sessions.
+          </Tool>
+          <Tool title="Cougar Gaming Desk">
+            Spacious gaming desk that accommodates my multi-monitor setup and
+            provides plenty of workspace.
+          </Tool>
+          <Tool title="Mobile Devices">
+            Galaxy S24 Ultra and iPhone 15 Pro for cross-platform testing and
+            development. Sony ZV-E10 camera for content creation.
           </Tool>
         </ToolsSection>
         <ToolsSection title="Development tools">
-          <Tool title="Sublime Text 4">
-            I don’t care if it’s missing all of the fancy IDE features everyone
-            else relies on, Sublime Text is still the best text editor ever
-            made.
+          <Tool title="Cursor">
+            My primary code editor of choice. The AI-powered features and clean
+            interface make it incredibly efficient for development.
           </Tool>
-          <Tool title="iTerm2">
-            I’m honestly not even sure what features I get with this that aren’t
-            just part of the macOS Terminal but it’s what I use.
+          <Tool title="WebStorm">
+            Powerful IDE for JavaScript and TypeScript development. The deep
+            language understanding and refactoring tools are invaluable.
           </Tool>
-          <Tool title="TablePlus">
-            Great software for working with databases. Has saved me from
-            building about a thousand admin interfaces for my various projects
-            over the years.
+          <Tool title="Visual Studio Code">
+            Versatile editor with an amazing ecosystem of extensions. Perfect
+            for quick edits and diverse programming languages.
+          </Tool>
+          <Tool title="PyCharm">
+            My go-to IDE for Python development. The intelligent code assistance
+            and debugging capabilities are unmatched.
           </Tool>
         </ToolsSection>
         <ToolsSection title="Design">
           <Tool title="Figma">
-            We started using Figma as just a design tool but now it’s become our
-            virtual whiteboard for the entire company. Never would have expected
-            the collaboration features to be the real hook.
+            Essential tool for UI/UX design and collaboration. Perfect for
+            creating and sharing design systems.
+          </Tool>
+          <Tool title="Miro Boards">
+            Digital whiteboard for brainstorming, planning, and visual
+            collaboration with teams.
           </Tool>
         </ToolsSection>
         <ToolsSection title="Productivity">
-          <Tool title="Alfred">
-            It’s not the newest kid on the block but it’s still the fastest. The
-            Sublime Text of the application launcher world.
+          <Tool title="Notion">
+            My central hub for note-taking, documentation, and project
+            management. The flexibility and organization features are
+            game-changing.
           </Tool>
-          <Tool title="Reflect">
-            Using a daily notes system instead of trying to keep things
-            organized by topics has been super powerful for me. And with
-            Reflect, it’s still easy for me to keep all of that stuff
-            discoverable by topic even though all of my writing happens in the
-            daily note.
+          <Tool title="Poppy AI">
+            Proud to have contributed to this innovative AI platform. Using it
+            daily for enhanced productivity and automation tasks.
           </Tool>
-          <Tool title="SavvyCal">
-            Great tool for scheduling meetings while protecting my calendar and
-            making sure I still have lots of time for deep work during the week.
-          </Tool>
-          <Tool title="Focus">
-            Simple tool for blocking distracting websites when I need to just do
-            the work and get some momentum going.
+          <Tool title="Calendly">
+            Streamlines meeting scheduling and time management. Makes it easy to
+            coordinate across different time zones.
           </Tool>
         </ToolsSection>
       </div>
