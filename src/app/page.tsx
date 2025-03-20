@@ -250,8 +250,9 @@ function Resume() {
         ))}
       </ol>
       <Button
-        href="#"
+        href="/resume.pdf"
         variant="secondary"
+        target="_blank"
         className="group mt-6 w-full bg-neutral-50 hover:bg-neutral-100 dark:bg-neutral-800/50 dark:hover:bg-neutral-700/50"
       >
         Download CV
